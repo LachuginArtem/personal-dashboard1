@@ -24,7 +24,10 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('refresh_token', data.refresh);
+        
+        // Сохраняем токен в Local Storage
+        localStorage.setItem('authToken', data.access);
+
         console.log('Login successful');
         console.log(data);
 

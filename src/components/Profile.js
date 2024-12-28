@@ -9,34 +9,38 @@ const Profile = () => {
   const { user, logout, updateUser } = useUser();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isClassifierVisible, setIsClassifierVisible] = useState(false);
-  const [profileData, setProfileData] = useState(user || {}); // Состояние для данных профиля
-  const [isMyDataVisible, setIsMyDataVisible] = useState(false); // Состояние для видимости формы "Мои данные"
+  const [isMyDataVisible, setIsMyDataVisible] = useState(false); 
+  const [profileData, setProfileData] = useState(user || {});
 
+  // Загружаем данные из localStorage при монтировании компонента
   useEffect(() => {
-    if (user) {
-      setProfileData({
-        name: user.name || '', // Если name отсутствует, то оставляем пустым
-        email: user.email || '', // Заполняем email из данных пользователя
-      });
+    const storedData = JSON.parse(localStorage.getItem('profileData'));
+    if (storedData) {
+      setProfileData(storedData);
     }
-  }, [user]);
+  }, []);
+
+  // Сохраняем данные в localStorage каждый раз, когда они изменяются
+  useEffect(() => {
+    localStorage.setItem('profileData', JSON.stringify(profileData));
+  }, [profileData]);
 
   const toggleFormVisibility = () => {
     setIsFormVisible(true);
     setIsClassifierVisible(false);
-    setIsMyDataVisible(false); // Скрываем форму "Мои данные" при открытии рекомендательной системы
+    setIsMyDataVisible(false);
   };
 
   const toggleClassifierVisibility = () => {
     setIsClassifierVisible(true);
     setIsFormVisible(false);
-    setIsMyDataVisible(false); // Скрываем форму "Мои данные" при открытии классификатора
+    setIsMyDataVisible(false);
   };
 
   const toggleMyDataVisibility = () => {
     setIsMyDataVisible(true);
     setIsFormVisible(false);
-    setIsClassifierVisible(false); // Скрываем остальные формы при открытии формы "Мои данные"
+    setIsClassifierVisible(false);
   };
 
   const saveChanges = () => {

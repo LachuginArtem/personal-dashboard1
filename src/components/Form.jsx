@@ -8,7 +8,7 @@ const Form = () => {
     sport: '',
     foreign: '',
     gpa: '',
-    points: 0, // Начальное значение для ползунка
+    points: 0,
     bonus_points: '',
     exams: [],
     reception_form: '',
@@ -18,15 +18,15 @@ const Form = () => {
   });
 
   const [responseMessage, setResponseMessage] = useState('');
-  const [recommendations, setRecommendations] = useState([]); // Состояние для направлений
-  const [isModalOpen, setIsModalOpen] = useState(false); // Состояние модального окна
+  const [recommendations, setRecommendations] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => {
+    setFormData(prevData => {
       if (name === 'exams') {
         const updatedExams = prevData.exams.includes(value)
-          ? prevData.exams.filter((exam) => exam !== value)
+          ? prevData.exams.filter(exam => exam !== value)
           : [...prevData.exams, value];
         return { ...prevData, exams: updatedExams };
       }
@@ -49,47 +49,48 @@ const Form = () => {
   ];
 
   const handleExamClick = (exam) => {
-    setFormData((prevFormData) => {
+    setFormData(prevFormData => {
       const updatedExams = prevFormData.exams.includes(exam)
-        ? prevFormData.exams.filter((item) => item !== exam)
+        ? prevFormData.exams.filter(item => item !== exam)
         : [...prevFormData.exams, exam];
-      return {
-        ...prevFormData,
-          exams: updatedExams,
-      };
+      return { ...prevFormData, exams: updatedExams };
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Отправляемые данные:', JSON.stringify(formData, null, 2));
-  
+
     try {
+      const token = localStorage.getItem('authToken'); // Исправили на 'authToken'
+      console.log('Токен:', token); // Логируем токен
+
       const response = await fetch(
         'https://personal-account-fastapi.onrender.com/predict/',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(formData, null, 2),
         }
       );
-      
-      console.log("Ответ сервера:", response); // Выводим ответ сервера
-  
+
+      console.log("Ответ сервера:", response);
+
       if (!response.ok) {
         throw new Error(`Ошибка HTTP: ${response.status}`);
       }
-  
+
       const data = await response.json();
-      console.log("Полученные данные:", data); // Выводим полученные данные
-  
+      console.log("Полученные данные:", data);
+
       if (data.status === 'ok') {
-        console.log("Рекомендации:", data.data); // Выводим рекомендации
+        console.log("Рекомендации:", data.data);
         setResponseMessage('Данные успешно отправлены!');
-        setRecommendations(data.data); // Сохраняем направления в состоянии
-        setIsModalOpen(true); // Открываем модальное окно
+        setRecommendations(data.data);
+        setIsModalOpen(true);
       } else {
         setResponseMessage('Ошибка при обработке данных.');
       }
@@ -98,10 +99,12 @@ const Form = () => {
       setResponseMessage('Произошла ошибка при отправке данных.');
     }
   };
+
   return (
     <div className="container mx-auto p-6">
       <form onSubmit={handleSubmit} className="bg-white p-8 shadow-xl rounded-lg w-full max-w-xl ml-7">
-        <label className="block mb-4 text-sm font-semibold">Количество направлений:
+        <label className="block mb-4 text-sm font-semibold">
+          Количество направлений:
           <input
             type="number"
             value={formData.top_n}
@@ -112,7 +115,8 @@ const Form = () => {
         </label>
 
         <fieldset className="space-y-4 mb-6">
-          <label className="block text-sm font-semibold">Пол:
+          <label className="block text-sm font-semibold">
+            Пол:
             <select
               value={formData.gender}
               name="gender"
@@ -126,7 +130,8 @@ const Form = () => {
             </select>
           </label>
 
-          <label className="block text-sm font-semibold">Возраст:
+          <label className="block text-sm font-semibold">
+            Возраст:
             <input
               type="number"
               value={formData.age}
@@ -137,7 +142,8 @@ const Form = () => {
             />
           </label>
 
-          <label className="block text-sm font-semibold">Вид спорта:
+          <label className="block text-sm font-semibold">
+            Вид спорта:
             <input
               type="text"
               value={formData.sport}
@@ -148,7 +154,8 @@ const Form = () => {
             />
           </label>
 
-          <label className="block text-sm font-semibold">Средний балл (GPA):
+          <label className="block text-sm font-semibold">
+            Средний балл (GPA):
             <input
               type="number"
               step="0.01"
@@ -160,22 +167,22 @@ const Form = () => {
             />
           </label>
 
-          <label className="block text-sm font-semibold">Общее количество баллов:
+          <label className="block text-sm font-semibold">
+            Общее количество баллов:
             <input
               type="range"
               min="0"
               max="310"
               step="1"
               value={formData.points}
-              onChange={(e) =>
-                setFormData({  ...formData, points: e.target.value  })
-              }
+              onChange={(e) => setFormData({ ...formData, points: e.target.value })}
               className="w-full mt-2"
             />
             <span className="text-sm">{formData.points} баллов</span>
           </label>
 
-          <label className="block text-sm font-semibold">Дополнительные баллы:
+          <label className="block text-sm font-semibold">
+            Дополнительные баллы:
             <input
               type="number"
               value={formData.bonus_points}
@@ -186,14 +193,13 @@ const Form = () => {
             />
           </label>
 
-          <label className="block text-sm font-semibold">Выберите экзамены:
+          <label className="block text-sm font-semibold">
+            Выберите экзамены:
             <div className="grid grid-cols-2 gap-2 mt-2">
               {egeExams.map((exam) => (
                 <div
                   key={exam}
-                  className={`p-2 border rounded-lg cursor-pointer ${
-                    formData.exams.includes(exam) ? 'bg-purple-500 text-white' : 'bg-gray-200'
-                  }`}
+                  className={`p-2 border rounded-lg cursor-pointer ${ formData.exams.includes(exam) ? 'bg-purple-500 text-white' : 'bg-gray-200' }`}
                   onClick={() => handleExamClick(exam)}
                 >
                   {exam}
@@ -202,7 +208,8 @@ const Form = () => {
             </div>
           </label>
 
-          <label className="block text-sm font-semibold">Приоритет:
+          <label className="block text-sm font-semibold">
+            Приоритет:
             <input
               type="number"
               value={formData.priority}
@@ -213,7 +220,8 @@ const Form = () => {
             />
           </label>
 
-          <label className="block text-sm font-semibold">Вид приема:
+          <label className="block text-sm font-semibold">
+            Вид приема:
             <select
               value={formData.reception_form}
               name="reception_form"
@@ -227,7 +235,8 @@ const Form = () => {
             </select>
           </label>
 
-          <label className="block text-sm font-semibold">Вид образования:
+          <label className="block text-sm font-semibold">
+            Вид образования:
             <select
               value={formData.education}
               name="education"
@@ -241,13 +250,20 @@ const Form = () => {
               <option value="Высшее общее образование">Высшее общее образование</option>
             </select>
           </label>
-
-          <label className="block text-sm font-semibold">Форма обучения:
+          Форма обучения:
+          <input
+            type="text"
+            name="study_form"
+            value={formData.study_form}
+            onChange={handleChange}
+          />
+        <label className="block text-sm font-semibold">
+            Форма обучения:
             <select
               name="study_form"
               value={formData.study_form}
               onChange={handleChange}
-              className="w-full p-2 mt-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="w-full p-2 mt-2 border rounded-lg focus:ring-2focus:ring-purple-500"
               required
             >
               <option value="">Выберите форму обучения</option>
@@ -266,25 +282,25 @@ const Form = () => {
       {/* Модальное окно */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-    <div className="bg-white p-6 shadow-lg rounded-lg w-96">
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-semibold">Результаты</h3>
-      </div>
-      <div className="mt-4">
-        {recommendations.length > 0 ? (
-          <ul className="space-y-2">
-            {recommendations.map((item, index) => (
-              <li key={index} className="p-2 border rounded-lg bg-gray-100">
-                {item.replace('Направление подготовки_', '')}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-600">Рекомендации отсутствуют.</p>
-        )}
-      </div>
-    </div>
-  </div>
+          <div className="bg-white p-6 shadow-lg rounded-lg w-96">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold">Результаты</h3>
+            </div>
+            <div className="mt-4">
+              {recommendations.length > 0 ? (
+                <ul className="space-y-2">
+                  {recommendations.map((item, index) => (
+                    <li key={index} className="p-2 border rounded-lg bg-gray-100">
+                      {item.replace('Направление подготовки_', '')}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-600">Рекомендации отсутствуют.</p>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
