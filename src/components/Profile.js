@@ -49,7 +49,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex flex-col font-sans">
+    <div className="flex flex-col font-sans" >
       {/* Header */}
       <header className="w-full bg-blue-800 text-white shadow-md fixed top-0 z-50">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
